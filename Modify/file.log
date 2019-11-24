@@ -252,7 +252,8 @@ esurf     !表面に要素作成
 !     接触要素定義(P-A)
 type,9                            !Conta172
 real,10                             !接触ペアのため、anvilと同じリアルコンスタントを用いる
-nsel,,,,pptopmin,pptopmax,1
+lsel,,line,,13 !Anvilの衝突面のラインを選択
+nsll
 esurf                            !表面に要素作成
 !
 !     Anvil
@@ -264,7 +265,8 @@ amesh,all
 !     接触要素定義(P-A)
 type,10                            !targe169
 real,10                             !接触ペアのため、Parentと同じリアルコンスタントを用いる
-nsel,,,,anbotmin,anbotmax,1
+lsel,,line,,15 !Flyerの衝突面のラインを選択
+nsll
 esurf                             !表面に要素作成
 type,10     !Targe169
 real,10     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
