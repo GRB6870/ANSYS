@@ -39,14 +39,6 @@ FINISH
 *SET,nmin,3084    !ldreadのコマンドに必要、メッシュ変更時にチェック(flyer)
 *SET,fdnmax,5633    !flyerの拘束条件に必要、メッシュ変更時にチェック
 *SET,fdnmin,4494    !flyerの拘束条件に必要、メッシュ変更時にチェック
-*SET,adnmax,15230    !anvilの拘束条件に必要、メッシュ変更時にチェック
-*SET,adnmin,15155    !anvilの拘33束条件に必要、メッシュ変更時にチェック
-*SET,ppbotmin,12893    !parent plateのtarge適用範囲
-*SET,ppbotmax,13193    !parent plateのtarge適用範囲
-*SET,pptopmin,13202    !parent plateのconta適用範囲
-*SET,pptopmax,13501    !parent plateのconta適用範囲
-*SET,anbotmin,15002    !anvilのtarge適用範囲
-*SET,anbotmax,15078    !anvilのtarge適用範囲
 !
 !    1.3.材料データ定義
 !    *use,材料,MatNo,'MatType'
@@ -358,8 +350,10 @@ finish
 !    8.2.構造解析用の設定
 !
 /solu
-d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件
-d,adnmin,uy,0,,adnmax,1,  !parent拘束条件
+d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件(固定部)
+lsel,,line,,17
+nsll
+d,all,uy,0,  !Anvil拘束条件(上辺)
 antype,trans
 nlgeom,on
 outres,all,all            !すべてのサブステップを保存
