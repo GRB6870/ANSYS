@@ -1,0 +1,23 @@
+!A5052
+finish
+*SET,d%ARG2%,2680    !密度
+*SET,pr%ARG2%,0.34    !ポアソン比 = pureAl?
+*SET,ym%ARG2%,70.3e+9    !ヤング率 = pureAl?
+*SET,er%ARG2%,4.93E-8    !電気抵抗率
+*SET,rp%ARG2%,0.99994    !比透磁率 = pureAl?
+/PREP7
+mpdata,ex,ARG1,,ym%ARG2%   !ヤング率
+mpdata,prxy,ARG1,,pr%ARG2%   !ポアソン比
+TB,PLASTIC,ARG1,1,9,MISO       ! Activate TB,PLASTIC data table
+!真ひずみ―真応力で入力すること，なお塑性変形が開始する点．この際塑性ひずみは0とすること
+!データ点間の傾きが負にならないようにすること．つまり最大引張応力までのプロット
+TBPT,DEFI,0.001648713,112.8859633E+6,
+TBPT,DEFI,0.001998003,119.5845895E+6,
+TBPT,DEFI,0.003992021,147.1818482E+6,
+TBPT,DEFI,0.004987542,57.3484087E+6,
+TBPT,DEFI,0.009950331,193.5742809E+6,
+TBPT,DEFI,0.014888612,218.4503105E+6,
+TBPT,DEFI,0.019802627,237.9650859E+6,
+TBPT,DEFI,0.024692613,254.2532489E+6,
+TBPT,DEFI,0.027615167,262.9303385E+6,
+FINISH

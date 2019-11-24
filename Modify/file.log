@@ -1,0 +1,570 @@
+﻿!画面設定ファイル;b,ml,vel.graphicsettingsファイルが必要
+!1.0初期設定パラメータファイル;ReadMatParameters,ReadExpParameters,ReadAnalysisParameters.mac
+!1.1 コメントアウトを一部変更,ReadMatParametersを整列
+!191115:9.1の位置変更。
+!191116:parametersファイルを作成。中に材料データ全部ぶち込んだ。
+!191118:微修正
+!191118-2:画像保存先を"images"に設定
+!191118-3:Images関連をいったん削除
+!191118-4:エリア作成法をKP作成-Area作成に変更,KP,Area番号振り直し
+!191121:材料特性データを全部外部化:Flyer,Parent材料変更への柔軟化
+!無限要素はまとめてメッシュするとバグる
+!ループ処理のネスト化
+FINISH
+/clear,all
+/title, DE:5kJ G:1.6mm T:0.4mm OL:3mm F:Cu P:Ni
+/nerr,0,99999999,-1,,-1
+/inquire,home_dir,directory !ホームディレクトリを"home_dir"に記録
+!
+!    1.1.実験パラメータ:ReadExpParametersから読み込み
+!
+/cwd,parameters     !ディレクトリを移動
+*use,ReadExpParameters.mac
+/cwd,home_dir(1,1)     !ホームディレクトリへ戻る
+!
+!    1.2.解析パラメータ
+!
+*SET,msc,0.5E-3    !コイルのメッシュサイズ
+*SET,msf,0.1E-3    !flyerのメッシュサイズ
+*SET,msa,0.1E-3    !parentのメッシュサイズ
+*SET,mss,2E-3    !空間のメッシュサイズ
+*SET,cg,0.01E-3    !衝突面のオフセット量
+*SET,time,0     !初期時間
+*SET,ftime,29E-6    !終了時刻
+*SET,tinc,0.5E-6    !時間間隔
+*SET,tfmag,19E-6    !電磁場を計算する時間(この時間以降は電磁場を計算しない)
+*SET,cycle,ftime/tinc   !繰り返し回数
+*SET,cn,429     !メッシュを変更するたびに変更が必要。コイルの節点を選択
+*SET,nmax,12892    !ldreadのコマンドに必要、メッシュ変更時にチェック(flyer)
+*SET,nmin,3084    !ldreadのコマンドに必要、メッシュ変更時にチェック(flyer)
+*SET,fdnmax,5633    !flyerの拘束条件に必要、メッシュ変更時にチェック
+*SET,fdnmin,4494    !flyerの拘束条件に必要、メッシュ変更時にチェック
+*SET,adnmax,15230    !anvilの拘束条件に必要、メッシュ変更時にチェック
+*SET,adnmin,15155    !anvilの拘33束条件に必要、メッシュ変更時にチェック
+*SET,ppbotmin,12893    !parent plateのtarge適用範囲
+*SET,ppbotmax,13193    !parent plateのtarge適用範囲
+*SET,pptopmin,13202    !parent plateのconta適用範囲
+*SET,pptopmax,13501    !parent plateのconta適用範囲
+*SET,anbotmin,15002    !anvilのtarge適用範囲
+*SET,anbotmax,15078    !anvilのtarge適用範囲
+!
+!    1.3.材料データ定義
+!    *use,材料,MatNo,'MatType'
+!    Cu,2,Coil
+!    Cu,3,Flyer
+!    SKD11,4,Anvil
+!    Ni,5,Parent
+!
+/PREP7
+mptemp,1,0    !ヤング率とポアソン比を定義するため
+/cwd,parameters
+*use,Air.mac,1,'Air'
+*use,Cu.mac,2,'Coil'
+*use,Cu.mac,3,'Flyer'
+*use,SKD11.mac,4,'Anvil'
+*use,Ni.mac,5,'Parent'
+/cwd,home_dir(1,1)
+!
+!Powerlaw Plasticity Example: Aluminum 1100
+!MP,ex,4,69e9 ! Pa
+!MP,nuxy,4,.33 ! No units
+!MP,dens,4,2710 ! kg/m3
+!TB,PLAW,4,,,2
+!TBDATA,1,0.598 ! k
+!TBDATA,2,0.216 ! n
+!TBDATA,3,6500.0 ! C (s-1)
+!TBDATA,4,4.0 ! P
+!
+parsev,scalar,p0   !初期パラメータを保存
+!
+!    1.4.要素タイプ定義
+!
+/PREP7
+et,1,plane13       !1:空間(連成場要素,レガシー要素であり推奨はPLANE223)
+et,2,plane53,4     !2:コイル(2D金属塊コンダクタ)
+et,3,plane53       !3:板材，金型(2-D 8-Node Magnetic Solid)
+et,4,infin110      !4;無限境界
+et,5,circu124,2    !5:キャパシタ
+et,6,circu124,0    !6:抵抗
+et,7,circu124,6    !7:2D塊型導体電圧源
+et,8,circu124,1    !8:インダクタ
+et,9,conta172      !9:Flyerの衝突面
+keyopt,9,12,3      !Conta172のキーオプション, 0:標準　1:滑りなし　2:分離なし(滑りは可)
+!3:固着　4:分離なし(常時)　5:固着(常時)　6:固着(初期接触)
+et,10,targe169     !10:Parentの衝突面
+!
+!    1.5.材料特性代入
+!
+emunit,mks    !単位系定義(メートル、キログラム、秒)
+!    空気:1
+mp,murx,1,rpAir,   !空気の比透磁率
+!    Coil:2(Cu)
+mp,murx,2,rpCoil,    !比透磁率
+mp,rsvx,2,erCoil,    !電気抵抗率
+mp,dens,2,dCoil    !密度
+!    Flyer:3(Cu)
+mp,murx,3,rpFlyer,    !比透磁率
+mp,rsvx,3,erFlyer,    !電気抵抗率
+mp,dens,3,dFlyer    !密度
+!    Anvil:4(SKD11)
+mp,murx,4,rpAnvil,    !比透磁率
+mp,rsvx,4,erAnvil,    !電気抵抗率
+mp,dens,4,dAnvil    !密度
+!    Parent:5(Ni)
+mp,murx,5,rpParent,    !比透磁率
+mp,rsvx,5,erParent,    !電気抵抗率
+mp,dens,5,dParent    !密度
+!
+!    1.6.リアルコンスタント定義
+!
+r,1,40e-6,cv    !キャパシタンス(F),初期電圧(V)
+r,2,rmpw    !回路解析→装置の抵抗値
+r,3,1,0    !ファクター
+r,4,acoil,,cl,+1   !断面積,,奥行き方向の長さ、電流方向　→コイル
+r,5,aplate,,pl,+1   !断面積,,奥行き方向の長さ、電流方向　→板
+r,6,idmpw,    !インダクタンス
+r,7,aanvil,,pl,+1   !断面積,,奥行き方向の長さ、電流方向　→parent
+r,8     !接触ペア、FlyerとParentで共通のリアルコンスタントを使う
+rmore,,,,cg    !衝突面のオフセット
+r,9,1    !無限要素のリアルコンスタント
+r,10,1
+!
+!    2.回路作成用のノード定義
+!
+n,1,-0.1,-0.025
+n,2,-0.1,0.025
+n,3,-0.125,-0.025
+n,4,-0.125,0.025
+!
+!     3.モデル作成
+!
+!     3.1.KP定義
+!     コイルのKP定義(1-6)
+k,,-30E-3,-10E-3      !キーポイント1
+k,,-20E-3,-10E-3      !キーポイント2
+k,,-20E-3,-8E-3       !キーポイント3
+k,,-23.5E-3,5E-3      !キーポイント4
+k,,-26.5E-3,5E-3      !キーポイント5
+k,,-30E-3,-8E-3       !キーポイント6
+!     FlyerのKP定義(7-10)
+k,,-23.5E-3-ol,5E-3+fcgap
+k,,+46.5E-3-ol,5E-3+fcgap
+k,,+46.5E-3-ol,5E-3+fcgap+tnf
+k,,-23.5E-3-ol,5E-3+fcgap+tnf
+!     ParentのKP定義(11-14)
+k,,-32E-3,5E-3+fcgap+tnf+gap
+k,,-17E-3,5E-3+fcgap+tnf+gap
+k,,-17E-3,5E-3+fcgap+tnf+gap+tna
+k,,-32E-3,5E-3+fcgap+tnf+gap+tna
+!     AnvilのKP定義(15-18)
+k,,-32E-3,5E-3+fcgap+tnf+gap+tna+0.1E-3
+k,,-17E-3,5E-3+fcgap+tnf+gap+tna+0.1E-3
+k,,-17E-3,5E-3+fcgap+tnf+gap+tna+15E-3
+k,,-32E-3,5E-3+fcgap+tnf+gap+tna+15E-3
+!     空間四隅のKP定義(19-22)
+k,,-50E-3,-20E-3     !左下(19)
+k,,45E-3,-20E-3     !右下(20)
+k,,45E-3,30E-3     !右上(21)
+k,,-50E-3,30E-3     !左上(22)
+!
+!     3.2.エリア生成
+!
+a,1,2,3,4,5,6     !コイル
+a,7,8,9,10     !Flyer
+a,11,12,13,14     !Parent
+a,15,16,17,18     !Anvil
+a,19,20,21,22     !空間
+aovlap,all     !空間のオーバーラップ
+numcmp,area     !エリア番号振り直し
+!     無限要素四隅のKP定義(23-26)
+k,,-60E-3,-30E-3      !無限要素　キーポイント23
+k,,55E-3,-30E-3       !無限要素　キーポイント24
+k,,55E-3,40E-3        !無限要素　キーポイント25
+k,,-60E-3,40E-3       !無限要素　キーポイント26
+a,23,19,22,26       !無限要素(左)
+a,23,24,20,19       !無限要素(下)
+a,20,24,25,21       !無限要素(右)
+a,22,21,25,26       !無限要素(上)
+!
+!    3.3.エリアへの材料No,リアルコンスタント,要素タイプ定義
+!
+!AATT,材料番号, リアルコンスタント, 要素タイプ
+/pnum,area,1
+aplot
+asel,s,,,1    !コイル
+aatt,2,4,2
+asel,s,,,2    !flyer
+aatt,3,5,3
+asel,s,,,3    !parent
+aatt,5,7,3
+asel,s,,,4    !anvil
+aatt,4,7,3
+asel,s,,,5    !空気
+aatt,1,,1
+asel,s,,,6    !無限境界左
+aatt,1,9,4
+asel,s,,,7    !無限境界右
+aatt,1,9,4
+asel,s,,,8    !無限境界下
+aatt,1,9,4
+asel,s,,,9    !無限境界左
+aatt,1,9,4
+!
+!    4.メッシング
+!
+!以下MappedMesh用
+!MSHAPE,0,2D
+!MSHKEY,1
+!
+!     コイル
+!
+esize,msc
+asel,s,,,1
+amesh,all
+lrefine,4,,,3,,,on     !上辺のメッシュ微細化
+!
+!     Flyer
+!
+allsel
+esize,msf
+asel,s,,,2
+amesh,all
+!     接触要素定義(F-P)
+type,9     !Conta172
+real,8     !接触ペアのため、Parentと同じリアルコンスタントを用いる
+asel,s,,,2    !Flyerのエリア選択
+nsla,s,1    !選択エリア内の節点選択
+esurf     !表面に要素作成
+!
+!     Parent
+!
+allsel
+esize,msa    !parentのメッシュサイズ
+asel,s,,,3
+amesh,all    !parentのメッシング
+!     接触要素定義(F-P)
+type,10     !Targe169
+real,8     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
+rmore,,,,cg    !衝突面のオフセット※これがないと接触時にモーフィングできなくなる
+lsel,,line,,11 !Flyerの衝突面のラインを選択
+nsll
+esurf     !表面に要素作成
+!     接触要素定義(P-A)
+type,9                            !Conta172
+real,10                             !接触ペアのため、anvilと同じリアルコンスタントを用いる
+nsel,,,,pptopmin,pptopmax,1
+esurf                            !表面に要素作成
+!
+!     Anvil
+!
+allsel
+esize,0.4E-3
+asel,s,,,4
+amesh,all
+!     接触要素定義(P-A)
+type,10                            !targe169
+real,10                             !接触ペアのため、Parentと同じリアルコンスタントを用いる
+nsel,,,,anbotmin,anbotmax,1
+esurf                             !表面に要素作成
+type,10     !Targe169
+real,10     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
+rmore,,,,cg    !衝突面のオフセット※これがないと接触時にモーフィングできなくなる
+esurf     !表面に要素作成
+!
+!     空間
+!
+allsel
+esize,mss
+asel,s,,,5
+amesh,all
+!
+!     無限要素
+!
+allsel
+aplot
+esize,,1    !無限要素の縦方向のメッシュ数
+asel,s,,,9
+amesh,all
+asel,s,,,8
+amesh,all
+asel,a,,,6,7
+amesh,all
+allsel
+!
+!    5.カップリング(コイル‐電流,起電力)
+!
+asel,s,,,1
+allsel,below,area
+cp,1,current,all
+cp,2,emf,all
+allsel
+!
+!    6.回路作成
+!
+type,5     !キャパシタ
+real,1
+e,1,3
+type,6     !抵抗
+real,2
+e,4,2
+type,8     !インダクタ
+real,6
+e,3,4
+type,7     !2D塊型電圧源
+real,3
+e,2,1,cn
+eplot
+finish
+!
+!    7.電磁場解析設定
+!
+/solu
+antype,trans
+!eqslv,pcg,
+d,1,volt,0                   !GROUND
+lsel,s,,,25
+sfl,all,inf
+lsel,s,,,26
+sfl,all,inf
+lsel,s,,,28
+sfl,all,inf
+lsel,s,,,30
+sfl,all,inf
+allsel
+outres,all,all    !全てのサブステップを保存
+nsubst,25,100,1    !サブステップ数、サブステップ数，最大サブステップ数，最小サブステップ数
+physics,write,fmag   !電磁場解析の設定を保存
+finish
+!
+!    8.1.
+!
+/PREP7
+lsclear,all
+et,1,0
+et,2,0
+et,3,plane183
+et,4,0
+et,5,0
+et,6,0
+et,7,0
+et,8,0
+et,9,conta172
+keyopt,9,12,3    !Conta172のキーオプション, 2:分離なし(滑りは可)
+et,10,targe169
+finish
+!
+!    8.2.構造解析用の設定
+!
+/solu
+d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件
+d,adnmin,uy,0,,adnmax,1,  !parent拘束条件
+antype,trans
+nlgeom,on
+outres,all,all            !すべてのサブステップを保存
+nsubst,20,200,10
+physics,write,mecha   !構造解析の設定を保存
+finish
+!
+!    9.解析
+!
+/filname,fmag
+physics,read,fmag   !電磁場解析の設定を読み込み
+/assign,esav,fmag,esav  !バイナリ識別子ESAVに対してfmagというファイルをESAVという拡張子で再定義
+/assign,emat,fmag,emat
+!↑バイナリ識別子EMATに対してfmagというファイルを
+!EMATという拡張子で要素マトリクスを再定義
+!
+eplot
+/solu
+parres,new,p0    !初期パラメータを保存
+*SET,time,time+tinc    !時間更新
+time,time    !終了時刻を設定
+rescontrol,,none,none
+solve     !電磁場解析実行(第1荷重ステップ)
+save
+parsev,scalar,p1,sav   !電磁場用パラメータを更新
+finish
+!磁束密度
+/post1
+set,last
+/gresume,b.graphicsettings,,    !画面設定を読み込み
+plnsol,B,sum    !磁束密度を表示
+/conter,1,10,0,0,20
+/replot
+finish
+/UI,copy,save,bmp,graph,color,norm,landscape,no,100 !BMPファイルで画像を出力
+/filename,mecha
+/prep7
+!TBDELE, Lab, MAT1, MAT2, INC
+tbdele,PLASTIC,2,4
+physics,read,mecha
+/assign,esav,mecha,esav         ! redirect files for use in thermal restart
+/assign,emat,mecha,emat
+eplot     !要素表示を生成
+FINISH
+/SOL
+parres,new,p0
+nsel,s,,,nmin,nmax,
+ldread,forc,last,,,,fmag,rst
+nsel,all
+*SET,time,time+tinc
+time,time
+rescon,define,all,all,1
+solve                      !構造解析実行(第1荷重ステップ)
+save
+parsev,scalar,p2,sav   !構造解析用パラメータを更新
+finish
+!材料位置
+/color,wbak,white   !背景を白に変更
+/post1
+set,last    !最終ステップを読み込み
+/gresume,ml.graphicsettings,,    !画像表示設定を読み込み
+pldisp,0    !変形形状を表示
+/replot
+finish
+/UI,copy,save,bmp,graph,co,norm,landscape,no,100  !BMPファイルで出力
+!速度コンター
+/post1
+set,last
+/gresume,vel.graphicsettings,,    !画面設定を読み込み
+plnsol,v,sum    !速度分布を表示
+/conter,1,10,0,100,600
+/replot
+finish
+/UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
+/prep7
+asel,s,,,1    !コイルのエリア選択
+nsla,s,1    !選択エリア内の節点選択
+cpdele,1,2,1,any   !モーフィングのためカップリング自由度を削除
+allsel
+asel,s,,,5    !非構造領域を選択(この場合、空気)
+damorph,all,,1    !非構造領域をモーフィング
+asel,s,,,2,3,
+allsel,below,area
+eplot
+finish
+*SET,cycle,ftime/tinc-1
+!
+!    ループ開始
+!
+*do,i,1,cycle,1    !doループ
+*if,i,ge,tfmag/tinc,then  !電磁場を計算する回数(実際の時間ではない)
+/filename,mecha
+/prep7
+!TBDELE, Lab, MAT1, MAT2, INC
+tbdele,PLASTIC,2,4
+finish
+physics,read,mecha
+/assign,esav,mecha,esav         ! redirect files for use in thermal restart
+/assign,emat,mecha,emat
+/solu
+antype,trans,rest   !※このコマンドを行うと、時間が*.r001？の     !パラメータに更新されてしまう。
+parres,new,p2,sav   !parresでパラメータを現サイクルのものに更新する。
+*SET,time,time+tinc    !時間更新
+time,time    !解析終了時刻
+RESCON,DEFINE,ALL,ALL, 1
+nsel,all
+solve                      !構造解析
+parsav,scalar,p2,sav   !パラメータの更新
+finish
+save
+!材料位置
+/color,wbak,white   !背景を白に変更
+/post1
+set,last    !最終ステップを読み込み
+/gresume,ml.graphicsettings,,    !画像表示設定を読み込み
+pldisp,0    !変形形状を表示
+/replot     !再描画
+finish
+/UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
+!速度コンター
+/post1
+set,last
+/gresume,vel.graphicsettings,,    !画面設定を読み込み
+plnsol,v,sum    !速度分布を表示
+/conter,1,10,0,100,600
+/replot
+finish
+/UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
+save
+*else
+/filename,fmag
+/prep7
+!TBDELE, Lab, MAT1, MAT2, INC
+tbdele,PLASTIC,2,3
+physics,read,fmag   !emagの設定を読み込み
+/assign,esav,fmag,esav         !redirect files for use in thermal restart
+/assign,emat,fmag,emat
+allsel
+eplot     !形状のチェックのため要素をプロット
+FINISH
+/SOL
+antype,trans,    !リスタート
+parres,new,p1,sav   !リスタートを行うため、パラメータを読み込む(超重要)
+*SET,time,time+tinc    !時間の進行
+time,time    !解析終了時間の設定
+rescontrol,,none,none
+solve     !電磁場解析
+save
+parsav,scalar,p1,sav   !次のリスタートを行うため、計算後のパラメータを保存する(超重要)
+finish
+!磁束密度
+/post1
+set,last
+/gresume,b.graphicsettings,,    !画面設定を読み込み
+plnsol,B,sum    !磁束密度を表示
+/conter,1,10,0,0,20
+/replot
+finish
+/UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
+finish
+/filename,mecha
+/prep7
+!TBDELE, Lab, MAT1, MAT2, INC
+tbdele,PLASTIC,2,3
+finish
+physics,read,mecha
+/assign,esav,mecha,esav         ! redirect files for use in thermal restart
+/assign,emat,mecha,emat
+/solu
+antype,trans,restart   !※このコマンドを行うと、時間が*.r001？のパラメータに更新されてしまう。
+parres,new,p2,sav   !parresでパラメータを現サイクルのものに更新する。
+*SET,time,time+tinc    !時間更新
+time,time    !解析終了時刻
+nsel,s,,,nmin,nmax,   !板材の節点を選択
+ldread,forc,last,,,,fmag,rst  !電磁力を前で選択した節点に読み込む
+RESCON,DEFINE,ALL,ALL,1
+nsel,all
+solve                      !構造解析
+parsav,scalar,p2,sav   !パラメータの更新
+finish
+save
+!材料位置
+/color,wbak,white   !背景を白に変更
+/post1
+set,last    !最終ステップを読み込み
+/gresume,ml.graphicsettings,,    !画像表示設定を読み込み
+pldisp,0    !変形形状を表示
+/replot     !再描画
+finish
+/UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
+!速度コンター
+/post1
+set,last
+/gresume,vel.graphicsettings,,    !画面設定を読み込み
+plnsol,v,sum    !速度分布を表示
+/conter,1,10,0,100,600
+/replot
+finish
+/UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
+/prep7
+asel,s,,,1    !Parentのエリア選択
+nsla,s,1    !選択エリア内の節点選択
+cpdele,1,2,1,any
+allsel
+asel,s,,,5     !空間エリアを選択
+damorph,all,,1    !非構造領域(空気)をモーフィング
+finish
+*endif
+*enddo
+!    ループ終わり

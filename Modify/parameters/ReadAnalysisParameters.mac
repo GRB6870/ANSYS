@@ -1,0 +1,25 @@
+FINISH
+*SET,msc,0.5E-3    !コイルのメッシュサイズ
+*SET,msf,0.1E-3    !flyerのメッシュサイズ
+*SET,msa,0.1E-3    !parentのメッシュサイズ
+*SET,mss,2E-3    !空間のメッシュサイズ
+*SET,cg,0.01E-3    !衝突面のオフセット量
+*SET,time,0     !初期時間
+*SET,ftime,29E-6    !終了時刻
+*SET,tinc,0.5E-6    !時間間隔
+*SET,tfmag,19E-6    !電磁場を計算する時間(この時間以降は電磁場を計算しない)
+*SET,cycle,ftime/tinc   !繰り返し回数
+*SET,cn,429     !メッシュを変更するたびに変更が必要。コイルの節点を選択
+*SET,nmax,12892    !ldreadのコマンドに必要、メッシュ変更時にチェック(flyer)
+*SET,nmin,3084    !ldreadのコマンドに必要、メッシュ変更時にチェック(flyer)
+*SET,fdnmax,5633    !flyerの拘束条件に必要、メッシュ変更時にチェック
+*SET,fdnmin,4494    !flyerの拘束条件に必要、メッシュ変更時にチェック
+*SET,adnmax,15230    !anvilの拘束条件に必要、メッシュ変更時にチェック
+*SET,adnmin,15155    !anvilの拘33束条件に必要、メッシュ変更時にチェック
+*SET,ppbotmin,12893    !parent plateのtarge適用範囲
+*SET,ppbotmax,13193    !parent plateのtarge適用範囲
+*SET,pptopmin,13202    !parent plateのconta適用範囲
+*SET,pptopmax,13501    !parent plateのconta適用範囲
+*SET,anbotmin,15002    !anvilのtarge適用範囲
+*SET,anbotmax,15078    !anvilのtarge適用範囲
+save

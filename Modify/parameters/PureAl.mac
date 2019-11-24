@@ -1,0 +1,23 @@
+!pureAl
+finish
+*SET,rp%ARG2%,0.99994    !比透磁率
+*SET,er%ARG2%,2.65E-8    !電気抵抗率
+*SET,ym%ARG2%,70.3e9    !ヤング率
+*SET,pr%ARG2%,0.34    !ポアソン比
+*SET,d%ARG2%,2730    !密度
+/PREP7
+mpdata,ex,ARG1,,ym%ARG2%   !アルミのヤング率   
+mpdata,prxy,ARG1,,pr%ARG2%   !アルミのポアソン比  
+!TB,非線形塑性ラベル,材料番号,使用する温度の数,データ点の数,MISO(多直線等方硬化塑性))
+TB,PLASTIC,ARG1,1,13,MISO       !Activate TB,PLASTIC data table
+!TBTEMP,温度,    !材料データテーブルの温度を定義   
+TBTEMP,0.0                  !Temperature = 0.0  
+!真ひずみ―真応力で入力すること，なお塑性変形が開始する点．この際塑性ひずみは0とすること 
+!データ点間の傾きが負にならないようにすること．つまり最大引張応力までのプロット  
+TBPT,DEFI,0,94.4E+6,!plot1  
+TBPT,DEFI,5E-2,104E+6,!plot2
+TBPT,DEFI,10E-2,115.2E+6,!plot3 
+TBPT,DEFI,15E-2,125.2E+6,!plot4 
+TBPT,DEFI,21.2E-2,136E+6,!plot5 
+TBPT,DEFI,5,168E+6,!plot10 過剰な変形を抑える補完点(ひずみ500％)
+finish

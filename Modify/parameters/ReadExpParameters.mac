@@ -1,0 +1,16 @@
+!実験パラメータの読み込み
+FINISH
+*SET,cv,15.7E+3    !充電電圧(V)
+*SET,rmpw,0.01    !装置の抵抗値
+*SET,idmpw,5E-7    !装置のインダクタンス
+*SET,acoil,1E-4    !コイルの断面積
+*SET,aplate,28E-6    !flyerの断面積
+*SET,aanvil,12E-6    !parentの断面積
+*SET,cl,0.16     !コイルの長さ
+*SET,pl,0.20     !flyer plateの長さ
+*SET,gap,1.6E-3    !Gap
+*SET,tnf,0.4E-3    !FlyerPlate板厚
+*SET,tna,0.4E-3    !ParentPlate板厚
+*SET,ol,3E-3     !Overlap
+*SET,fcgap,0.36E-3    !FPとコイルの間のGap
+save

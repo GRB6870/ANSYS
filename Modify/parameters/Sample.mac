@@ -1,0 +1,16 @@
+!Sample
+finish
+*SET,ym%ARG2%,'Value'    !ヤング率
+*SET,er%ARG2%,'Value'    !電気抵抗率
+*SET,rp%ARG2%,'Value'    !比透磁率
+*SET,pr%ARG2%,'Value'    !ポアソン比
+*SET,d%ARG2%,'Value'    !密度
+/PREP7
+mpdata,ex,ARG1,,ym%ARG2%   !ヤング率
+mpdata,prxy,ARG1,,pr%ARG2%   !ポアソン比
+TB,PLASTIC,ARG1,1,'TBPTのデータ数',MISO       ! Activate TB,PLASTIC data table
+!真ひずみ―真応力で入力すること，なお塑性変形が開始する点．この際塑性ひずみは0とすること
+!データ点間の傾きが負にならないようにすること．つまり最大引張応力までのプロット
+TBPT,DEFI,'TrueStrain','TrueStress',
+TBPT,DEFI,'TrueStrain','TrueStress',
+finish
