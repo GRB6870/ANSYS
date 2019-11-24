@@ -1,16 +1,4 @@
-﻿!画面設定ファイル;b,ml,vel.graphicsettingsファイルが必要
-!1.0初期設定パラメータファイル;ReadMatParameters,ReadExpParameters,ReadAnalysisParameters.mac
-!1.1 コメントアウトを一部変更,ReadMatParametersを整列
-!191115:9.1の位置変更。
-!191116:parametersファイルを作成。中に材料データ全部ぶち込んだ。
-!191118:微修正
-!191118-2:画像保存先を"images"に設定
-!191118-3:Images関連をいったん削除
-!191118-4:エリア作成法をKP作成-Area作成に変更,KP,Area番号振り直し
-!191121:材料特性データを全部外部化:Flyer,Parent材料変更への柔軟化
-!無限要素はまとめてメッシュするとバグる
-!ループ処理のネスト化
-FINISH
+﻿FINISH
 /clear,all
 /title, DE:5kJ G:1.6mm T:0.4mm OL:3mm F:Cu P:Ni
 /nerr,0,99999999,-1,,-1
