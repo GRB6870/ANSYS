@@ -117,7 +117,7 @@ r,5,aplate,,pl,+1   !断面積,,奥行き方向の長さ、電流方向　→板
 r,6,idmpw,    !インダクタンス
 r,7,aanvil,,pl,+1   !断面積,,奥行き方向の長さ、電流方向　→parent
 r,8     !接触ペア、FlyerとParentで共通のリアルコンスタントを使う
-rmore,,,,cg    !衝突面のオフセット
+rmore,,,,cg    !衝突面のオフセット（R10へ定義)
 r,9,1    !無限要素のリアルコンスタント
 r,10,1
 !
@@ -204,10 +204,6 @@ aatt,1,9,4
 !
 !    4.メッシング
 !
-!以下MappedMesh用
-!MSHAPE,0,2D
-!MSHKEY,1
-!
 !     コイル
 !
 esize,msc
@@ -217,7 +213,6 @@ lrefine,4,,,3,,,on     !上辺のメッシュ微細化
 !
 !     Flyer
 !
-allsel
 esize,msf
 asel,s,,,2
 amesh,all
@@ -226,31 +221,28 @@ type,9     !Conta172
 real,8     !接触ペアのため、Parentと同じリアルコンスタントを用いる
 asel,s,,,2    !Flyerのエリア選択
 nsla,s,1    !選択エリア内の節点選択
-esurf     !表面に要素作成
+esurf
 !
 !     Parent
 !
-allsel
 esize,msa    !parentのメッシュサイズ
 asel,s,,,3
 amesh,all    !parentのメッシング
 !     接触要素定義(F-P)
 type,10     !Targe169
 real,8     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
-rmore,,,,cg    !衝突面のオフセット※これがないと接触時にモーフィングできなくなる
 lsel,,line,,11 !Flyerの衝突面のラインを選択
 nsll
-esurf     !表面に要素作成
+esurf
 !     接触要素定義(P-A)
 type,9                            !Conta172
 real,10                             !接触ペアのため、anvilと同じリアルコンスタントを用いる
 lsel,,line,,13 !Anvilの衝突面のラインを選択
 nsll
-esurf                            !表面に要素作成
+esurf
 !
 !     Anvil
 !
-allsel
 esize,0.4E-3
 asel,s,,,4
 amesh,all
@@ -259,23 +251,16 @@ type,10                            !targe169
 real,10                             !接触ペアのため、Parentと同じリアルコンスタントを用いる
 lsel,,line,,15 !Flyerの衝突面のラインを選択
 nsll
-esurf                             !表面に要素作成
-type,10     !Targe169
-real,10     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
-rmore,,,,cg    !衝突面のオフセット※これがないと接触時にモーフィングできなくなる
-esurf     !表面に要素作成
+esurf
 !
 !     空間
 !
-allsel
 esize,mss
 asel,s,,,5
 amesh,all
 !
 !     無限要素
 !
-allsel
-aplot
 esize,,1    !無限要素の縦方向のメッシュ数
 asel,s,,,9
 amesh,all
@@ -283,7 +268,6 @@ asel,s,,,8
 amesh,all
 asel,a,,,6,7
 amesh,all
-allsel
 !
 !    5.カップリング(コイル‐電流,起電力)
 !
