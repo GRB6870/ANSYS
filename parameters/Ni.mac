@@ -1,0 +1,27 @@
+!Niのデータ
+finish
+*SET,d%ARG2%,8900    !密度
+*SET,pr%ARG2%,0.34    !ポアソン比
+*SET,ym%ARG2%,200e+9    !ヤング率
+*SET,er%ARG2%,6.99E-8    !電気抵抗率
+*SET,rp%ARG2%,300    !比透磁率
+/PREP7
+mpdata,ex,ARG1,,ym%ARG2%   !Niのヤング率
+mpdata,prxy,ARG1,,pr%ARG2%   !Niのポアソン比
+TB,PLASTIC,ARG1,1,13,MISO       !Activate TB,PLASTIC data table
+TBTEMP,0.0                  !Temperature = 0.0
+!真ひずみ―真応力で入力すること，なお塑性変形が開始する点．この際塑性ひずみは0とすること
+!データ点間の傾きが負にならないようにすること．つまり最大引張応力までのプロット
+TBPT,DEFI,0,580E+6,!plot1
+TBPT,DEFI,5E-2,726E+6,!plot2
+TBPT,DEFI,1E-1,818E+6,!plot3
+TBPT,DEFI,1.5E-1,888E+6,!plot4
+TBPT,DEFI,2E-1,935E+6,!plot5
+TBPT,DEFI,2.5E-1,978E+6,!plot6
+TBPT,DEFI,3E-1,1023E+6,!plot7
+TBPT,DEFI,3.5E-1,1030E+6,!plot8
+TBPT,DEFI,4E-1,1063E+6,!plot9
+TBPT,DEFI,4.5E-1,1092E+6,!plot10
+TBPT,DEFI,5E-1,1122E+6,!plot11
+TBPT,DEFI,2,1500E+6,!plot12 過剰な変形を抑える補完点(ひずみ200％)
+FINISH

@@ -1,0 +1,31 @@
+!CuのSSカーブなど
+!ARG1:MatNo,ARG2:用途:Coil,Flyer,Parent,Anvil
+FINISH
+*SET,rp%ARG2%,1.000022    !比透磁率
+*SET,er%ARG2%,1.68E-8    !電気抵抗率
+*SET,ym%ARG2%,120e9    !ヤング率
+*SET,pr%ARG2%,0.34    !ポアソン比
+*SET,d%ARG2%,8940    !密度
+/PREP7
+mpdata,ex,ARG1,,ym%ARG2%   !銅のヤング率
+mpdata,prxy,ARG1,,pr%ARG2%   !銅のポアソン比
+TB,PLASTIC,ARG1,1,26,MISO       !Activate TB,PLASTIC data table
+TBTEMP,0.0                  !Temperature = 0.0
+!真ひずみ―真応力で入力すること，なお塑性変形が開始する点．この際塑性ひずみは0とすること
+!データ点間の傾きが負にならないようにすること．つまり最大引張応力までのプロット
+TBPT,DEFI,0E-2,50E+6,!plot2
+TBPT,DEFI,2E-2,103.67E+6,!plot3
+TBPT,DEFI,4E-2,123E+6,!plot4
+TBPT,DEFI,6E-2,144E+6,!plot5
+TBPT,DEFI,8E-2,160E+6,!plot6
+TBPT,DEFI,1E-1,177.67E+6,!plot7
+TBPT,DEFI,1.2E-1,191.33E+6,!plot8
+TBPT,DEFI,1.4E-1,203.67E+6,!plot9
+TBPT,DEFI,1.6E-1,215.67E+6,!plot10
+TBPT,DEFI,1.8E-1,226E+6,!plot11
+TBPT,DEFI,2.0E-1,233.33E+6,!plot12
+TBPT,DEFI,2.2E-1,241E+6,!plot13
+TBPT,DEFI,2.4E-1,248E+6,!plot14
+TBPT,DEFI,2.6E-1,252E+6,!plot15
+TBPT,DEFI,2.8E-1,256E+6,!plot16
+FINISH

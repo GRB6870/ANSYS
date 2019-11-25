@@ -1,0 +1,4 @@
+!空気
+FINISH
+*SET,rp%ARG2%,1     !比透磁率
+FINISH
