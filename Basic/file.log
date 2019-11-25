@@ -325,7 +325,12 @@ seltor,1E-5
 nsel,,loc,y,5E-3+fcgap+tnf
 seltor
 nsel,r,loc,x,-0.0135,46.5E-3-ol
+<<<<<<< HEAD
 d,all,uy,0, !flyer拘束条件(固定部)
+=======
+d,all,uy,0,
+!d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件(固定部)
+>>>>>>> ed1b3236b63c66e6e5e8f7eebfd954c335edc781
 lsel,,line,,17
 nsll,,1
 d,all,uy,0,  !Anvil拘束条件(上辺)
