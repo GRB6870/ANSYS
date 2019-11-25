@@ -223,13 +223,13 @@ amesh,all    !parentのメッシング
 type,10     !Targe169
 real,8     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
 lsel,,line,,11 !Flyerの衝突面のラインを選択
-nsll
+nsll,,1
 esurf
 !     接触要素定義(P-A)
 type,9                            !Conta172
 real,10                             !接触ペアのため、anvilと同じリアルコンスタントを用いる
 lsel,,line,,13 !Anvilの衝突面のラインを選択
-nsll
+nsll,,1
 esurf
 !
 !     4.4.Anvil
@@ -241,7 +241,7 @@ amesh,all
 type,10                            !targe169
 real,10                             !接触ペアのため、Parentと同じリアルコンスタントを用いる
 lsel,,line,,15 !Flyerの衝突面のラインを選択
-nsll
+nsll,,1
 esurf
 !
 !     4.5.空間
@@ -327,7 +327,7 @@ finish
 /solu
 d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件(固定部)
 lsel,,line,,17
-nsll
+nsll,,1
 d,all,uy,0,  !Anvil拘束条件(上辺)
 allsel
 antype,trans
@@ -384,7 +384,9 @@ eplot     !要素表示を生成
 FINISH
 /SOL
 parres,new,p0
-nsel,s,,,nmin,nmax,
+asel,,,,2
+nsel,,1
+!nsel,s,,,nmin,nmax,
 ldread,forc,last,,,,fmag,rst
 nsel,all
 *SET,time,time+tinc
@@ -536,7 +538,9 @@ antype,trans,restart   !※このコマンドを行うと、時間が*.r001？�
 parres,new,p2,sav   !parresでパラメータを現サイクルのものに更新する。
 *SET,time,time+tinc    !時間更新
 time,time    !解析終了時刻
-nsel,s,,,nmin,nmax,   !板材の節点を選択
+asel,,,,2
+nsel,,1
+!nsel,s,,,nmin,nmax,   !板材の節点を選択
 ldread,forc,last,,,,fmag,rst  !電磁力を前で選択した節点に読み込む
 RESCON,DEFINE,ALL,ALL,1
 nsel,all
