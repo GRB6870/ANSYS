@@ -1,15 +1,3 @@
-﻿!画面設定ファイル;b,ml,vel.graphicsettingsファイルが必要
-!1.0初期設定パラメータファイル;ReadMatParameters,ReadExpParameters,ReadAnalysisParameters.mac
-!1.1 コメントアウトを一部変更,ReadMatParametersを整列
-!191115:9.1の位置変更。
-!191116:parametersファイルを作成。中に材料データ全部ぶち込んだ。
-!191118:微修正
-!191118-2:画像保存先を"images"に設定
-!191118-3:Images関連をいったん削除
-!191118-4:エリア作成法をKP作成-Area作成に変更,KP,Area番号振り直し
-!191121:材料特性データを全部外部化:Flyer,Parent材料変更への柔軟化
-!無限要素はまとめてメッシュするとバグる
-!ループ処理のネスト化
 FINISH
 /clear,all
 /title, DE:5kJ G:1.6mm T:0.4mm OL:3mm F:Cu P:Ni
@@ -39,14 +27,6 @@ FINISH
 *SET,nmin,3084    !ldreadのコマンドに必要、メッシュ変更時にチェック(flyer)
 *SET,fdnmax,5633    !flyerの拘束条件に必要、メッシュ変更時にチェック
 *SET,fdnmin,4494    !flyerの拘束条件に必要、メッシュ変更時にチェック
-*SET,adnmax,15230    !anvilの拘束条件に必要、メッシュ変更時にチェック
-*SET,adnmin,15155    !anvilの拘33束条件に必要、メッシュ変更時にチェック
-*SET,ppbotmin,12893    !parent plateのtarge適用範囲
-*SET,ppbotmax,13193    !parent plateのtarge適用範囲
-*SET,pptopmin,13202    !parent plateのconta適用範囲
-*SET,pptopmax,13501    !parent plateのconta適用範囲
-*SET,anbotmin,15002    !anvilのtarge適用範囲
-*SET,anbotmax,15078    !anvilのtarge適用範囲
 !
 !    1.3.材料データ定義
 !    *use,材料,MatNo,'MatType'
@@ -125,7 +105,7 @@ r,5,aplate,,pl,+1   !断面積,,奥行き方向の長さ、電流方向　→板
 r,6,idmpw,    !インダクタンス
 r,7,aanvil,,pl,+1   !断面積,,奥行き方向の長さ、電流方向　→parent
 r,8     !接触ペア、FlyerとParentで共通のリアルコンスタントを使う
-rmore,,,,cg    !衝突面のオフセット
+rmore,,,,cg    !衝突面のオフセット（R10へ定義)
 r,9,1    !無限要素のリアルコンスタント
 r,10,1
 !
@@ -212,10 +192,6 @@ aatt,1,9,4
 !
 !    4.メッシング
 !
-!以下MappedMesh用
-!MSHAPE,0,2D
-!MSHKEY,1
-!
 !     コイル
 !
 esize,msc
@@ -225,7 +201,6 @@ lrefine,4,,,3,,,on     !上辺のメッシュ微細化
 !
 !     Flyer
 !
-allsel
 esize,msf
 asel,s,,,2
 amesh,all
@@ -234,53 +209,46 @@ type,9     !Conta172
 real,8     !接触ペアのため、Parentと同じリアルコンスタントを用いる
 asel,s,,,2    !Flyerのエリア選択
 nsla,s,1    !選択エリア内の節点選択
-esurf     !表面に要素作成
+esurf
 !
 !     Parent
 !
-allsel
 esize,msa    !parentのメッシュサイズ
 asel,s,,,3
 amesh,all    !parentのメッシング
 !     接触要素定義(F-P)
 type,10     !Targe169
 real,8     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
-rmore,,,,cg    !衝突面のオフセット※これがないと接触時にモーフィングできなくなる
-nsel,,,,ppbotmin,ppbotmax,1
-esurf     !表面に要素作成
+lsel,,line,,11 !Flyerの衝突面のラインを選択
+nsll
+esurf
 !     接触要素定義(P-A)
 type,9                            !Conta172
 real,10                             !接触ペアのため、anvilと同じリアルコンスタントを用いる
-nsel,,,,pptopmin,pptopmax,1
-esurf                            !表面に要素作成
+lsel,,line,,13 !Anvilの衝突面のラインを選択
+nsll
+esurf
 !
 !     Anvil
 !
-allsel
 esize,0.4E-3
 asel,s,,,4
 amesh,all
 !     接触要素定義(P-A)
 type,10                            !targe169
 real,10                             !接触ペアのため、Parentと同じリアルコンスタントを用いる
-nsel,,,,anbotmin,anbotmax,1
-esurf                             !表面に要素作成
-type,10     !Targe169
-real,10     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
-rmore,,,,cg    !衝突面のオフセット※これがないと接触時にモーフィングできなくなる
-esurf     !表面に要素作成
+lsel,,line,,15 !Flyerの衝突面のラインを選択
+nsll
+esurf
 !
 !     空間
 !
-allsel
 esize,mss
 asel,s,,,5
 amesh,all
 !
 !     無限要素
 !
-allsel
-aplot
 esize,,1    !無限要素の縦方向のメッシュ数
 asel,s,,,9
 amesh,all
@@ -288,7 +256,6 @@ asel,s,,,8
 amesh,all
 asel,a,,,6,7
 amesh,all
-allsel
 !
 !    5.カップリング(コイル‐電流,起電力)
 !
@@ -355,8 +322,10 @@ finish
 !    8.2.構造解析用の設定
 !
 /solu
-d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件
-d,adnmin,uy,0,,adnmax,1,  !parent拘束条件
+d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件(固定部)
+lsel,,line,,17
+nsll
+d,all,uy,0,  !Anvil拘束条件(上辺)
 antype,trans
 nlgeom,on
 outres,all,all            !すべてのサブステップを保存
