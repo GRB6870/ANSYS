@@ -325,7 +325,12 @@ finish
 !    8.2.構造解析用の設定
 !
 /solu
-d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件(固定部)
+seltor,1E-5
+nsel,,loc,y,5E-3+fcgap+tnf
+seltor
+nsel,r,loc,x,-0.0135,46.5E-3-ol
+d,all,uy,0,
+!d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件(固定部)
 lsel,,line,,17
 nsll,,1
 d,all,uy,0,  !Anvil拘束条件(上辺)
