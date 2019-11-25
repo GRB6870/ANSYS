@@ -305,7 +305,7 @@ nsubst,25,100,1    !サブステップ数、サブステップ数，最大サブ
 physics,write,fmag   !電磁場解析の設定を保存
 finish
 !
-!    8.1.
+!    8.1.荷重ステップ削除,要素タイプ再定義
 !
 /PREP7
 lsclear,all

@@ -1,3 +1,6 @@
+!
+!    0.ファイル名定義
+!
 FINISH
 /clear,all
 /title, DE:5kJ G:1.6mm T:0.4mm OL:3mm F:Cu P:Ni
@@ -192,14 +195,14 @@ aatt,1,9,4
 !
 !    4.メッシング
 !
-!     コイル
+!     4.1.コイル
 !
 esize,msc
 asel,s,,,1
 amesh,all
 lrefine,4,,,3,,,on     !上辺のメッシュ微細化
 !
-!     Flyer
+!     4.2.Flyer
 !
 esize,msf
 asel,s,,,2
@@ -211,7 +214,7 @@ asel,s,,,2    !Flyerのエリア選択
 nsla,s,1    !選択エリア内の節点選択
 esurf
 !
-!     Parent
+!     4.3.Parent
 !
 esize,msa    !parentのメッシュサイズ
 asel,s,,,3
@@ -229,7 +232,7 @@ lsel,,line,,13 !Anvilの衝突面のラインを選択
 nsll
 esurf
 !
-!     Anvil
+!     4.4.Anvil
 !
 esize,0.4E-3
 asel,s,,,4
@@ -241,13 +244,13 @@ lsel,,line,,15 !Flyerの衝突面のラインを選択
 nsll
 esurf
 !
-!     空間
+!     4.5.空間
 !
 esize,mss
 asel,s,,,5
 amesh,all
 !
-!     無限要素
+!     4.6.無限要素
 !
 esize,,1    !無限要素の縦方向のメッシュ数
 asel,s,,,9
@@ -302,7 +305,7 @@ nsubst,25,100,1    !サブステップ数、サブステップ数，最大サブ
 physics,write,fmag   !電磁場解析の設定を保存
 finish
 !
-!    8.1.
+!    8.1.荷重ステップ削除,要素タイプ再定義
 !
 /PREP7
 lsclear,all
@@ -336,14 +339,17 @@ finish
 !
 !    9.解析
 !
+!    Solu-Emag
+!
 /filname,fmag
 physics,read,fmag   !電磁場解析の設定を読み込み
 /assign,esav,fmag,esav  !バイナリ識別子ESAVに対してfmagというファイルをESAVという拡張子で再定義
 /assign,emat,fmag,emat
 !↑バイナリ識別子EMATに対してfmagというファイルを
 !EMATという拡張子で要素マトリクスを再定義
-!
 eplot
+!
+!
 /solu
 parres,new,p0    !初期パラメータを保存
 *SET,time,time+tinc    !時間更新
@@ -353,7 +359,9 @@ solve     !電磁場解析実行(第1荷重ステップ)
 save
 parsev,scalar,p1,sav   !電磁場用パラメータを更新
 finish
-!磁束密度
+!
+!    Post-Emag:磁束密度出力
+!
 /post1
 set,last
 /gresume,b.graphicsettings,,    !画面設定を読み込み
@@ -363,6 +371,9 @@ plnsol,B,sum    !磁束密度を表示
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100 !BMPファイルで画像を出力
 /filename,mecha
+!
+!    Solu-Mecha
+!
 /prep7
 !TBDELE, Lab, MAT1, MAT2, INC
 tbdele,PLASTIC,2,4
@@ -383,7 +394,9 @@ solve                      !構造解析実行(第1荷重ステップ)
 save
 parsev,scalar,p2,sav   !構造解析用パラメータを更新
 finish
-!材料位置
+!
+!    Post-Mecha:材料位置
+!
 /color,wbak,white   !背景を白に変更
 /post1
 set,last    !最終ステップを読み込み
@@ -392,7 +405,9 @@ pldisp,0    !変形形状を表示
 /replot
 finish
 /UI,copy,save,bmp,graph,co,norm,landscape,no,100  !BMPファイルで出力
-!速度コンター
+!
+!    Post-Mecha:速度コンター
+!
 /post1
 set,last
 /gresume,vel.graphicsettings,,    !画面設定を読み込み
@@ -401,6 +416,9 @@ plnsol,v,sum    !速度分布を表示
 /replot
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
+!
+!    モーフィング
+!
 /prep7
 asel,s,,,1    !コイルのエリア選択
 nsla,s,1    !選択エリア内の節点選択
@@ -412,12 +430,15 @@ asel,s,,,2,3,
 allsel,below,area
 eplot
 finish
-*SET,cycle,ftime/tinc-1
 !
-!    ループ開始
+!    10.ループ開始
 !
+*SET,cycle,ftime/tinc-1 !cycle=57
 *do,i,1,cycle,1    !doループ
-*if,i,ge,tfmag/tinc,then  !電磁場を計算する回数(実際の時間ではない)
+*if,i,ge,tfmag/tinc,then !電磁場を計算する回数,i>=tfmag/tinc=38
+!
+!    mecha実施
+!
 /filename,mecha
 /prep7
 !TBDELE, Lab, MAT1, MAT2, INC
@@ -426,6 +447,8 @@ finish
 physics,read,mecha
 /assign,esav,mecha,esav         ! redirect files for use in thermal restart
 /assign,emat,mecha,emat
+!
+!
 /solu
 antype,trans,rest   !※このコマンドを行うと、時間が*.r001？の     !パラメータに更新されてしまう。
 parres,new,p2,sav   !parresでパラメータを現サイクルのものに更新する。
@@ -437,7 +460,9 @@ solve                      !構造解析
 parsav,scalar,p2,sav   !パラメータの更新
 finish
 save
-!材料位置
+!
+!    Post-Mecha:材料位置
+!
 /color,wbak,white   !背景を白に変更
 /post1
 set,last    !最終ステップを読み込み
@@ -446,7 +471,9 @@ pldisp,0    !変形形状を表示
 /replot     !再描画
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
-!速度コンター
+!
+!    Post-Mecha:速度コンター
+!
 /post1
 set,last
 /gresume,vel.graphicsettings,,    !画面設定を読み込み
@@ -456,7 +483,10 @@ plnsol,v,sum    !速度分布を表示
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
 save
-*else
+!
+!    if終わり,else開始
+!
+*else    !fmag実施
 /filename,fmag
 /prep7
 !TBDELE, Lab, MAT1, MAT2, INC
@@ -477,7 +507,9 @@ solve     !電磁場解析
 save
 parsav,scalar,p1,sav   !次のリスタートを行うため、計算後のパラメータを保存する(超重要)
 finish
-!磁束密度
+!
+!    Post-Emag:磁束密度
+!
 /post1
 set,last
 /gresume,b.graphicsettings,,    !画面設定を読み込み
@@ -487,11 +519,15 @@ plnsol,B,sum    !磁束密度を表示
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
 finish
+!
+!
 /filename,mecha
 /prep7
 !TBDELE, Lab, MAT1, MAT2, INC
 tbdele,PLASTIC,2,3
 finish
+!
+!
 physics,read,mecha
 /assign,esav,mecha,esav         ! redirect files for use in thermal restart
 /assign,emat,mecha,emat
@@ -508,7 +544,9 @@ solve                      !構造解析
 parsav,scalar,p2,sav   !パラメータの更新
 finish
 save
-!材料位置
+!
+!    Post-Mecha:材料位置
+!
 /color,wbak,white   !背景を白に変更
 /post1
 set,last    !最終ステップを読み込み
@@ -517,7 +555,9 @@ pldisp,0    !変形形状を表示
 /replot     !再描画
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
-!速度コンター
+!
+!    Post-Mecha:速度コンター
+!
 /post1
 set,last
 /gresume,vel.graphicsettings,,    !画面設定を読み込み
@@ -526,6 +566,8 @@ plnsol,v,sum    !速度分布を表示
 /replot
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
+!
+!
 /prep7
 asel,s,,,1    !Parentのエリア選択
 nsla,s,1    !選択エリア内の節点選択
@@ -534,6 +576,9 @@ allsel
 asel,s,,,5     !空間エリアを選択
 damorph,all,,1    !非構造領域(空気)をモーフィング
 finish
+!
+!    else終わり
+!
 *endif
 *enddo
 !    ループ終わり
