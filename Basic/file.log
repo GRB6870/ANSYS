@@ -327,7 +327,6 @@ lsel,,line,,17
 nsll
 d,all,uy,0,  !Anvil拘束条件(上辺)
 allsel
-
 antype,trans
 nlgeom,on
 outres,all,all            !すべてのサブステップを保存
