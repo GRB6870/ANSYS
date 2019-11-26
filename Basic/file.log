@@ -385,8 +385,7 @@ FINISH
 /SOL
 parres,new,p0
 asel,,,,2
-nsel,,1
-!nsel,s,,,nmin,nmax,
+nsla,,1
 ldread,forc,last,,,,fmag,rst
 nsel,all
 *SET,time,time+tinc
@@ -539,8 +538,7 @@ parres,new,p2,sav   !parresでパラメータを現サイクルのものに更�
 *SET,time,time+tinc    !時間更新
 time,time    !解析終了時刻
 asel,,,,2
-nsel,,1
-!nsel,s,,,nmin,nmax,   !板材の節点を選択
+nsla,,1
 ldread,forc,last,,,,fmag,rst  !電磁力を前で選択した節点に読み込む
 RESCON,DEFINE,ALL,ALL,1
 nsel,all
