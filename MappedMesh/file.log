@@ -26,10 +26,6 @@ FINISH
 *SET,tfmag,19E-6    !電磁場を計算する時間(この時間以降は電磁場を計算しない)
 *SET,cycle,ftime/tinc   !繰り返し回数
 *SET,cn,429     !メッシュを変更するたびに変更が必要。コイルの節点を選択
-*SET,nmax,12892    !ldreadのコマンドに必要、メッシュ変更時にチェック(flyer)
-*SET,nmin,3084    !ldreadのコマンドに必要、メッシュ変更時にチェック(flyer)
-*SET,fdnmax,5633    !flyerの拘束条件に必要、メッシュ変更時にチェック
-*SET,fdnmin,4494    !flyerの拘束条件に必要、メッシュ変更時にチェック
 !
 !    1.3.材料データ定義
 !    *use,材料,MatNo,'MatType'
@@ -223,13 +219,13 @@ amesh,all    !parentのメッシング
 type,10     !Targe169
 real,8     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
 lsel,,line,,11 !Flyerの衝突面のラインを選択
-nsll
+nsll,,1
 esurf
 !     接触要素定義(P-A)
 type,9                            !Conta172
 real,10                             !接触ペアのため、anvilと同じリアルコンスタントを用いる
 lsel,,line,,13 !Anvilの衝突面のラインを選択
-nsll
+nsll,,1
 esurf
 !
 !     4.4.Anvil
@@ -241,7 +237,7 @@ amesh,all
 type,10                            !targe169
 real,10                             !接触ペアのため、Parentと同じリアルコンスタントを用いる
 lsel,,line,,15 !Flyerの衝突面のラインを選択
-nsll
+nsll,,1
 esurf
 !
 !     4.5.空間
@@ -325,9 +321,13 @@ finish
 !    8.2.構造解析用の設定
 !
 /solu
-d,fdnmin,uy,0,,fdnmax,1,  !flyer拘束条件(固定部)
+seltor,1E-5
+nsel,,loc,y,5E-3+fcgap+tnf
+seltor
+nsel,r,loc,x,-0.0135,46.5E-3-ol
+d,all,uy,0, !flyer拘束条件(固定部)
 lsel,,line,,17
-nsll
+nsll,,1
 d,all,uy,0,  !Anvil拘束条件(上辺)
 allsel
 antype,trans
@@ -384,7 +384,8 @@ eplot     !要素表示を生成
 FINISH
 /SOL
 parres,new,p0
-nsel,s,,,nmin,nmax,
+asel,,,,2
+nsla,,1
 ldread,forc,last,,,,fmag,rst
 nsel,all
 *SET,time,time+tinc
@@ -536,7 +537,8 @@ antype,trans,restart   !※このコマンドを行うと、時間が*.r001？�
 parres,new,p2,sav   !parresでパラメータを現サイクルのものに更新する。
 *SET,time,time+tinc    !時間更新
 time,time    !解析終了時刻
-nsel,s,,,nmin,nmax,   !板材の節点を選択
+asel,,,,2
+nsla,,1
 ldread,forc,last,,,,fmag,rst  !電磁力を前で選択した節点に読み込む
 RESCON,DEFINE,ALL,ALL,1
 nsel,all
