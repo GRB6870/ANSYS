@@ -1,3 +1,5 @@
+!    空間のメッシュサイズ二種類用意
+!    コイルメッシュ微細化なし
 !
 !    0.ファイル名定義
 !
@@ -373,7 +375,7 @@ mshkey,0,2D
 esize,msc
 asel,s,,,1,2
 amesh,all
-lrefine,6,,,3,,,on     !上辺のメッシュ微細化
+!lrefine,6,,,3,,,on     !上辺のメッシュ微細化
 !
 !     4.2.Flyer
 !
@@ -425,27 +427,25 @@ esurf
 !
 !     4.5.空間
 !
+esize,msa
+asel,,,,12,13
+asel,a,,,15
+asel,a,,,17,18
+asel,a,,,20,21
+asel,a,,,26,27
+asel,a,,,30
+amesh,all
 esize,mss
 !Coil周り
 asel,s,,,53
 asel,a,,,16
-asel,a,,,23
-asel,a,,,19,20
+asel,a,,,19
 !Flyer周り
-asel,a,,,12
 asel,a,,,25
-asel,a,,,27
 asel,a,,,45
 asel,a,,,29
-asel,a,,,15
-asel,a,,,17
-asel,a,,,26
 ！Parent周り
-asel,a,,,30
 asel,a,,,22
-asel,a,,,21
-asel,a,,,13
-asel,a,,,18
 asel,a,,,38
 !Anvil周り
 asel,a,,,31
@@ -453,7 +453,12 @@ asel,a,,,49,51
 asel,a,,,39
 amesh,all
 !
-asel,s,,,14
+esize,msa
+asel,,,,14
+asel,a,,,23
+amesh,all
+!
+esize,mss
 asel,a,,,24
 asel,a,,,28
 asel,a,,,32,34
