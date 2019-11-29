@@ -148,7 +148,8 @@ k,,-50E-3,30E-3     !左上(22)
 !
 !     3.2.エリア生成
 !
-a,1,2,3,4,5,6     !コイル
+a,1,2,3,6     !コイル
+a,3,4,5,6
 a,7,8,9,10     !Flyer
 a,11,12,13,14     !Parent
 a,15,16,17,18     !Anvil
@@ -170,23 +171,17 @@ a,22,21,25,26       !無限要素(上)
 !AATT,材料番号, リアルコンスタント, 要素タイプ
 /pnum,area,1
 aplot
-asel,s,,,1    !コイル
+asel,s,,,1,2    !コイル
 aatt,2,4,2
-asel,s,,,2    !flyer
+asel,s,,,3     !flyer
 aatt,3,5,3
-asel,s,,,3    !parent
+asel,s,,,4    !parent
 aatt,5,7,3
-asel,s,,,4    !anvil
+asel,s,,,5    !anvil
 aatt,4,7,3
-asel,s,,,5    !空気
+asel,s,,,6    !空気
 aatt,1,,1
-asel,s,,,6    !無限境界左
-aatt,1,9,4
-asel,s,,,7    !無限境界右
-aatt,1,9,4
-asel,s,,,8    !無限境界下
-aatt,1,9,4
-asel,s,,,9    !無限境界左
+asel,s,,,7,10    !無限境界左
 aatt,1,9,4
 !
 !    4.メッシング
@@ -194,37 +189,37 @@ aatt,1,9,4
 !     4.1.コイル
 !
 esize,msc
-asel,s,,,1
+lesize,6,msf
+asel,s,,,1,2
 amesh,all
-lrefine,4,,,3,,,on     !上辺のメッシュ微細化
 !
 !     4.2.Flyer
 !
 esize,msf
-asel,s,,,2
+asel,s,,,3
 amesh,all
 !     接触要素定義(F-P)
 type,9     !Conta172
 real,8     !接触ペアのため、Parentと同じリアルコンスタントを用いる
-asel,s,,,2    !Flyerのエリア選択
+asel,s,,,3    !Flyerのエリア選択
 nsla,s,1    !選択エリア内の節点選択
 esurf
 !
 !     4.3.Parent
 !
 esize,msa    !parentのメッシュサイズ
-asel,s,,,3
+asel,s,,,4
 amesh,all    !parentのメッシング
 !     接触要素定義(F-P)
 type,10     !Targe169
 real,8     !接触ペアのため、Flyerと同じリアルコンスタントを用いる
-lsel,,line,,11 !Flyerの衝突面のラインを選択
+lsel,,line,,12 !Flyerの衝突面のラインを選択
 nsll,,1
 esurf
 !     接触要素定義(P-A)
 type,9                            !Conta172
 real,10                             !接触ペアのため、anvilと同じリアルコンスタントを用いる
-lsel,,line,,13 !Anvilの衝突面のラインを選択
+lsel,,line,,14 !Anvilの衝突面のラインを選択
 nsll,,1
 esurf
 !
@@ -236,29 +231,29 @@ amesh,all
 !     接触要素定義(P-A)
 type,10                            !targe169
 real,10                             !接触ペアのため、Parentと同じリアルコンスタントを用いる
-lsel,,line,,15 !Flyerの衝突面のラインを選択
+lsel,,line,,16 !Flyerの衝突面のラインを選択
 nsll,,1
 esurf
 !
 !     4.5.空間
 !
 esize,mss
-asel,s,,,5
+asel,s,,,6
 amesh,all
 !
 !     4.6.無限要素
 !
 esize,,1    !無限要素の縦方向のメッシュ数
+asel,s,,,10
+amesh,all
 asel,s,,,9
 amesh,all
-asel,s,,,8
-amesh,all
-asel,a,,,6,7
+asel,a,,,7,8
 amesh,all
 !
 !    5.カップリング(コイル‐電流,起電力)
 !
-asel,s,,,1
+asel,s,,,1,2
 allsel,below,area
 cp,1,current,all
 cp,2,emf,all
@@ -287,13 +282,9 @@ finish
 antype,trans
 !eqslv,pcg,
 d,1,volt,0                   !GROUND
-lsel,s,,,25
-sfl,all,inf
-lsel,s,,,26
-sfl,all,inf
-lsel,s,,,28
-sfl,all,inf
-lsel,s,,,30
+lsel,s,,,26,27
+lsel,a,,,29
+lsel,a,,,31
 sfl,all,inf
 allsel
 outres,all,all    !全てのサブステップを保存
@@ -326,7 +317,7 @@ nsel,,loc,y,5E-3+fcgap+tnf
 seltor
 nsel,r,loc,x,-0.0135,46.5E-3-ol
 d,all,uy,0, !flyer拘束条件(固定部)
-lsel,,line,,17
+lsel,,line,,18
 nsll,,1
 d,all,uy,0,  !Anvil拘束条件(上辺)
 allsel
@@ -384,7 +375,7 @@ eplot     !要素表示を生成
 FINISH
 /SOL
 parres,new,p0
-asel,,,,2
+asel,,,,3
 nsla,,1
 ldread,forc,last,,,,fmag,rst
 nsel,all
@@ -421,13 +412,13 @@ finish
 !    モーフィング
 !
 /prep7
-asel,s,,,1    !コイルのエリア選択
+asel,s,,,1,2    !コイルのエリア選択
 nsla,s,1    !選択エリア内の節点選択
 cpdele,1,2,1,any   !モーフィングのためカップリング自由度を削除
 allsel
-asel,s,,,5    !非構造領域を選択(この場合、空気)
+asel,s,,,6    !非構造領域を選択(この場合、空気)
 damorph,all,,1    !非構造領域をモーフィング
-asel,s,,,2,3,
+asel,s,,,3,4
 allsel,below,area
 eplot
 finish
@@ -537,7 +528,7 @@ antype,trans,restart   !※このコマンドを行うと、時間が*.r001？�
 parres,new,p2,sav   !parresでパラメータを現サイクルのものに更新する。
 *SET,time,time+tinc    !時間更新
 time,time    !解析終了時刻
-asel,,,,2
+asel,,,,3
 nsla,,1
 ldread,forc,last,,,,fmag,rst  !電磁力を前で選択した節点に読み込む
 RESCON,DEFINE,ALL,ALL,1
@@ -571,11 +562,11 @@ finish
 !
 !
 /prep7
-asel,s,,,1    !Parentのエリア選択
+asel,s,,,1,2    !コイルのエリア選択
 nsla,s,1    !選択エリア内の節点選択
 cpdele,1,2,1,any
 allsel
-asel,s,,,5     !空間エリアを選択
+asel,s,,,6     !空間エリアを選択
 damorph,all,,1    !非構造領域(空気)をモーフィング
 finish
 !
