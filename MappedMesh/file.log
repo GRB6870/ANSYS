@@ -1,5 +1,6 @@
-!    空間のメッシュサイズ二種類用意
-!    コイルメッシュ微細化なし
+!Anvil,Coil,Flyer,Parentのメッシュサイズそろえた方がいい
+!MappedMeshするとNode,Elementが15000くらい増える
+!MappedMeshしても結局モーフィングで破壊されるのであんま意味ない
 !
 !    0.ファイル名定義
 !
@@ -187,7 +188,7 @@ NUMCMP,area
 !
 !    3.2.5.空間(12-32)
 !
-wpcsys,-1,0    (WPリセット)
+wpcsys,-1,0    !WPリセット
 k,,-32E-3,-10E-3     !KP35
 k,,46.5E-3-ol,-10E-3    !KP36
 k,,46.5E-3-ol,5E-3+fcgap+tnf+gap+tna+15E-3    !KP37
@@ -345,7 +346,7 @@ ASBW,79
 KWPAVE,69
 ASBW,80
 numcmp,area
-wpcsys,-1,0    (WPリセット)
+wpcsys,-1,0    !WPリセット
 !
 !    3.3.エリアへの材料No,リアルコンスタント,要素タイプ定義
 !
@@ -444,7 +445,7 @@ asel,a,,,19
 asel,a,,,25
 asel,a,,,45
 asel,a,,,29
-！Parent周り
+!Parent周り
 asel,a,,,22
 asel,a,,,38
 !Anvil周り
@@ -569,7 +570,7 @@ finish
 !
 !    9.解析
 !
-!    Solu-Emag
+!    9.1.1.Solu-Emag
 !
 /filname,fmag
 physics,read,fmag   !電磁場解析の設定を読み込み
@@ -578,8 +579,6 @@ physics,read,fmag   !電磁場解析の設定を読み込み
 !↑バイナリ識別子EMATに対してfmagというファイルを
 !EMATという拡張子で要素マトリクスを再定義
 eplot
-!
-!
 /solu
 parres,new,p0    !初期パラメータを保存
 *SET,time,time+tinc    !時間更新
@@ -590,7 +589,7 @@ save
 parsev,scalar,p1,sav   !電磁場用パラメータを更新
 finish
 !
-!    Post-Emag:磁束密度出力
+!    9.1.2.Post-Emag:磁束密度出力
 !
 /post1
 set,last
@@ -600,10 +599,10 @@ plnsol,B,sum    !磁束密度を表示
 /replot
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100 !BMPファイルで画像を出力
+!
+!    9.2.1.Solu-Mecha
+!
 /filename,mecha
-!
-!    Solu-Mecha
-!
 /prep7
 !TBDELE, Lab, MAT1, MAT2, INC
 tbdele,PLASTIC,2,4
@@ -612,7 +611,7 @@ physics,read,mecha
 /assign,emat,mecha,emat
 eplot     !要素表示を生成
 FINISH
-/SOL
+/solu
 parres,new,p0
 asel,,,,3,5
 nsla,,1
@@ -626,7 +625,7 @@ save
 parsev,scalar,p2,sav   !構造解析用パラメータを更新
 finish
 !
-!    Post-Mecha:材料位置
+!    9.2.2.Post-Mecha:材料位置
 !
 /color,wbak,white   !背景を白に変更
 /post1
@@ -637,7 +636,7 @@ pldisp,0    !変形形状を表示
 finish
 /UI,copy,save,bmp,graph,co,norm,landscape,no,100  !BMPファイルで出力
 !
-!    Post-Mecha:速度コンター
+!    9.2.3.Post-Mecha:速度コンター
 !
 /post1
 set,last
@@ -648,7 +647,7 @@ plnsol,v,sum    !速度分布を表示
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
 !
-!    モーフィング
+!    9.3.モーフィング
 !
 /prep7
 asel,s,,,1,2    !コイルのエリア選択
@@ -668,7 +667,7 @@ finish
 *do,i,1,cycle,1    !doループ
 *if,i,ge,tfmag/tinc,then !電磁場を計算する回数,i>=tfmag/tinc=38
 !
-!    mecha実施
+!    10.1.1.mecha実施
 !
 /filename,mecha
 /prep7
@@ -692,7 +691,7 @@ parsav,scalar,p2,sav   !パラメータの更新
 finish
 save
 !
-!    Post-Mecha:材料位置
+!    10.1.2.Post-Mecha:材料位置
 !
 /color,wbak,white   !背景を白に変更
 /post1
@@ -703,7 +702,7 @@ pldisp,0    !変形形状を表示
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
 !
-!    Post-Mecha:速度コンター
+!    10.1.3.Post-Mecha:速度コンター
 !
 /post1
 set,last
@@ -715,7 +714,7 @@ finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
 save
 !
-!    if終わり,else開始
+!    10.2.1.if終わり,else開始
 !
 *else    !fmag実施
 /filename,fmag
@@ -728,7 +727,7 @@ physics,read,fmag   !emagの設定を読み込み
 allsel
 eplot     !形状のチェックのため要素をプロット
 FINISH
-/SOL
+/SOLU
 antype,trans,    !リスタート
 parres,new,p1,sav   !リスタートを行うため、パラメータを読み込む(超重要)
 *SET,time,time+tinc    !時間の進行
@@ -739,7 +738,7 @@ save
 parsav,scalar,p1,sav   !次のリスタートを行うため、計算後のパラメータを保存する(超重要)
 finish
 !
-!    Post-Emag:磁束密度
+!    10.2.2.Post-Emag:磁束密度
 !
 /post1
 set,last
@@ -751,6 +750,7 @@ finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
 finish
 !
+!    10.2.3.Solu-Mecha
 !
 /filename,mecha
 /prep7
@@ -777,7 +777,7 @@ parsav,scalar,p2,sav   !パラメータの更新
 finish
 save
 !
-!    Post-Mecha:材料位置
+!    10.2.4.Post-Mecha:材料位置
 !
 /color,wbak,white   !背景を白に変更
 /post1
@@ -788,7 +788,7 @@ pldisp,0    !変形形状を表示
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
 !
-!    Post-Mecha:速度コンター
+!    10.2.5.Post-Mecha:速度コンター
 !
 /post1
 set,last
@@ -799,9 +799,10 @@ plnsol,v,sum    !速度分布を表示
 finish
 /UI,copy,save,bmp,graph,color,norm,landscape,no,100  !BMPファイルで出力
 !
+!    10.2.6.モーフィング
 !
 /prep7
-asel,s,,,1,2    !Parentのエリア選択
+asel,s,,,1,2    !コイルのエリア選択
 nsla,s,1    !選択エリア内の節点選択
 cpdele,1,2,1,any
 allsel
